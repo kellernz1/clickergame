@@ -29,7 +29,7 @@ export function loadGame() {
     }
     return { offlineSeconds, offlineGain };
   } catch (error) {
-    console.error("Falha ao carregar save", error);
+    console.error("Failed to load save", error);
     return { offlineSeconds: 0, offlineGain: null };
   }
 }

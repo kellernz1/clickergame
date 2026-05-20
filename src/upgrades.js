@@ -38,6 +38,30 @@ export const UPGRADES = [
     },
   },
   {
+    id: "ventureKeyboard",
+    name: "Venture Keyboard",
+    type: "Click",
+    cost: D(250000000),
+    description: "4x clickValue",
+    unlockText: "Reach level 20.",
+    isUnlocked: () => state.playerLevel >= 20,
+    apply: () => {
+      state.clickValue = state.clickValue.times(4);
+    },
+  },
+  {
+    id: "executiveDesk",
+    name: "Executive Desk",
+    type: "Click",
+    cost: D(25000000000),
+    description: "8x clickValue",
+    unlockText: "Reach level 35.",
+    isUnlocked: () => state.playerLevel >= 35,
+    apply: () => {
+      state.clickValue = state.clickValue.times(8);
+    },
+  },
+  {
     id: "freeCoffee",
     name: "Free Coffee",
     type: "Generator",
@@ -58,6 +82,106 @@ export const UPGRADES = [
     apply: () => {},
   },
   {
+    id: "franchiseManual",
+    name: "Franchise Manual",
+    type: "Generator",
+    cost: D(25000),
+    description: "Corner Stores produce 2x",
+    unlockText: "Own 25 Corner Stores.",
+    isUnlocked: () => (state.generators.cornerStore || 0) >= 25,
+    apply: () => {},
+  },
+  {
+    id: "boardRoom",
+    name: "Board Room",
+    type: "Generator",
+    cost: D(10000000),
+    description: "Corporations produce 2.5x",
+    unlockText: "Own 15 Corporations.",
+    isUnlocked: () => (state.generators.corporation || 0) >= 15,
+    apply: () => {},
+  },
+  {
+    id: "globalLogistics",
+    name: "Global Logistics",
+    type: "Generator",
+    cost: D(500000000),
+    description: "Conglomerates produce 4x",
+    unlockText: "Own 10 Conglomerates.",
+    isUnlocked: () => (state.generators.conglomerate || 0) >= 10,
+    apply: () => {},
+  },
+  {
+    id: "orbitalPayroll",
+    name: "Orbital Payroll",
+    type: "Generator",
+    cost: D(10000000000),
+    description: "Orbital Offices produce 5x",
+    unlockText: "Own 8 Orbital Offices.",
+    isUnlocked: () => (state.generators.orbitalOffice || 0) >= 8,
+    apply: () => {},
+  },
+  {
+    id: "lunarDrills",
+    name: "Lunar Drills",
+    type: "Generator",
+    cost: D(250000000000),
+    description: "Moon Mines produce 6x",
+    unlockText: "Own 8 Moon Mines.",
+    isUnlocked: () => (state.generators.moonMine || 0) >= 8,
+    apply: () => {},
+  },
+  {
+    id: "quantumLedger",
+    name: "Quantum Ledger",
+    type: "Generator",
+    cost: D(10000000000000),
+    description: "Quantum Banks produce 8x",
+    unlockText: "Own 6 Quantum Banks.",
+    isUnlocked: () => (state.generators.quantumBank || 0) >= 6,
+    apply: () => {},
+  },
+  {
+    id: "starTraders",
+    name: "Star Traders",
+    type: "Generator",
+    cost: D(500000000000000),
+    description: "Star Markets produce 10x",
+    unlockText: "Own 5 Star Markets.",
+    isUnlocked: () => (state.generators.starMarket || 0) >= 5,
+    apply: () => {},
+  },
+  {
+    id: "galacticMonopoly",
+    name: "Galactic Monopoly",
+    type: "Generator",
+    cost: D(5000000000000000),
+    description: "Galactic Exchanges produce 12x",
+    unlockText: "Own 3 Galactic Exchanges.",
+    isUnlocked: () => (state.generators.galacticExchange || 0) >= 3,
+    apply: () => {},
+  },
+  {
+    id: "managementSchool",
+    name: "Management School",
+    type: "Global",
+    cost: D(2500000),
+    description: "+25% total DPS",
+    unlockText: "Reach level 12.",
+    isUnlocked: () => state.playerLevel >= 12,
+    apply: () => {},
+  },
+  {
+    id: "hyperAutomation",
+    name: "Hyper Automation",
+    type: "Global",
+    cost: D(100000000000),
+    description: "2x total DPS",
+    unlockText: "Reach level 30.",
+    isUnlocked: () => state.playerLevel >= 30,
+    apply: () => {},
+  },
+  {
     id: "autoHand",
     name: "Automatic Hand",
     type: "Autoclicker",
@@ -65,6 +189,26 @@ export const UPGRADES = [
     description: "Simulates 10 clicks/second",
     unlockText: "Available from the start.",
     isUnlocked: () => true,
+    apply: () => {},
+  },
+  {
+    id: "autoHandII",
+    name: "Automatic Hand II",
+    type: "Autoclicker",
+    cost: D(100000000),
+    description: "Adds 50 clicks/second",
+    unlockText: "Buy Automatic Hand.",
+    isUnlocked: () => Boolean(state.purchasedUpgrades.autoHand),
+    apply: () => {},
+  },
+  {
+    id: "autoDepartment",
+    name: "Automation Department",
+    type: "Autoclicker",
+    cost: D(1000000000000),
+    description: "Adds 250 clicks/second",
+    unlockText: "Buy Automatic Hand II.",
+    isUnlocked: () => Boolean(state.purchasedUpgrades.autoHandII),
     apply: () => {},
   },
 ];
@@ -100,5 +244,11 @@ export function getAchievementClickMultiplier() {
  * @returns {Decimal}
  */
 export function getAutoClicksPerSecond() {
-  return state.purchasedUpgrades.autoHand ? D(10) : D(0);
+  let clicks = D(0);
+  if (state.purchasedUpgrades.autoHand) clicks = clicks.plus(10);
+  if (state.purchasedUpgrades.autoHandII) clicks = clicks.plus(50);
+  if (state.purchasedUpgrades.autoDepartment) clicks = clicks.plus(250);
+  if (state.purchasedRebirthUpgrades.autoClickCore) clicks = clicks.plus(25);
+  if (state.purchasedRebirthUpgrades.autoClickSingularity) clicks = clicks.times(2);
+  return clicks;
 }

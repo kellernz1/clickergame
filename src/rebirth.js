@@ -20,6 +20,60 @@ export const REBIRTH_UPGRADES = [
     cost: D(8),
     description: "Permanently increases XP gained.",
   },
+  {
+    id: "cosmicMentor",
+    name: "Cosmic Mentor",
+    cost: D(35),
+    description: "Doubles all XP gained.",
+  },
+  {
+    id: "gemEfficiency",
+    name: "Gem Efficiency",
+    cost: D(15),
+    description: "Each Cosmic Gem gives +3% money instead of +2%.",
+  },
+  {
+    id: "cosmicPortfolio",
+    name: "Cosmic Portfolio",
+    cost: D(25),
+    description: "Adds a permanent 1.25x global money multiplier.",
+  },
+  {
+    id: "darkMatterDividend",
+    name: "Dark Matter Dividend",
+    cost: D(75),
+    description: "Adds a permanent 2x global money multiplier.",
+  },
+  {
+    id: "criticalTraining",
+    name: "Critical Training",
+    cost: D(20),
+    description: "Critical clicks pay 5x instead of 3x.",
+  },
+  {
+    id: "autoClickCore",
+    name: "Auto Click Core",
+    cost: D(18),
+    description: "Permanently adds 25 automatic clicks/second.",
+  },
+  {
+    id: "autoClickSingularity",
+    name: "Auto Click Singularity",
+    cost: D(60),
+    description: "Doubles all automatic clicks/second.",
+  },
+  {
+    id: "rebirthHarvester",
+    name: "Rebirth Harvester",
+    cost: D(40),
+    description: "Earn 25% more Cosmic Gems from each Rebirth.",
+  },
+  {
+    id: "keepGeneratorPlus",
+    name: "Keep 5 generators after Rebirth",
+    cost: D(50),
+    description: "Keeps 5 units of your best owned generator after Rebirth.",
+  },
 ];
 
 /**
@@ -36,7 +90,9 @@ export function canRebirth() {
  * @returns {Decimal}
  */
 export function calculateRebirthGems() {
-  return state.runCoins.div(1000000).sqrt().floor();
+  let gems = state.runCoins.div(1000000).sqrt().floor();
+  if (state.purchasedRebirthUpgrades.rebirthHarvester) gems = gems.times(1.25).floor();
+  return gems;
 }
 
 /**
@@ -48,11 +104,22 @@ export function getCriticalChance() {
 }
 
 /**
+ * Calculates the critical click reward multiplier.
+ * @returns {Decimal}
+ */
+export function getCriticalMultiplier() {
+  return state.purchasedRebirthUpgrades.criticalTraining ? D(5) : D(3);
+}
+
+/**
  * Calculates XP gain multiplier from rebirth upgrades.
  * @returns {Decimal}
  */
 export function getXpMultiplier() {
-  return state.purchasedRebirthUpgrades.xpBoost ? D(1.5) : D(1);
+  let multiplier = D(1);
+  if (state.purchasedRebirthUpgrades.xpBoost) multiplier = multiplier.times(1.5);
+  if (state.purchasedRebirthUpgrades.cosmicMentor) multiplier = multiplier.times(2);
+  return multiplier;
 }
 
 /**
@@ -70,7 +137,7 @@ export function buyRebirthUpgrade(upgradeId) {
 
 /**
  * Resets run progress, grants gems, and preserves permanent rebirth state.
- * @returns {{gemsGained: Decimal, keptGeneratorName: string}}
+ * @returns {{gemsGained: Decimal, keptGeneratorName: string, keptGeneratorAmount: number}}
  */
 export function performRebirth() {
   const gemsGained = calculateRebirthGems();
@@ -85,20 +152,21 @@ export function performRebirth() {
   state.rebirths += 1;
   state.cosmicGems = state.cosmicGems.plus(gemsGained);
   state.generators = {
-    support: 0,
-    cornerStore: 0,
-    factory: 0,
-    corporation: 0,
-    conglomerate: 0,
+    ...Object.fromEntries(GENERATORS.map((generator) => [generator.id, 0])),
   };
-  if (kept.id) state.generators[kept.id] = 1;
-  return { gemsGained, keptGeneratorName: kept.name };
+  if (kept.id) state.generators[kept.id] = kept.amount;
+  return { gemsGained, keptGeneratorName: kept.name, keptGeneratorAmount: kept.amount };
 }
 
 function getKeptGenerator() {
-  if (!state.purchasedRebirthUpgrades.keepGenerator) return { id: "", name: "" };
+  if (!state.purchasedRebirthUpgrades.keepGenerator && !state.purchasedRebirthUpgrades.keepGeneratorPlus) return { id: "", name: "", amount: 0 };
   for (const generator of [...GENERATORS].reverse()) {
-    if ((state.generators[generator.id] || 0) > 0) return generator;
+    if ((state.generators[generator.id] || 0) > 0) {
+      return {
+        ...generator,
+        amount: state.purchasedRebirthUpgrades.keepGeneratorPlus ? 5 : 1,
+      };
+    }
   }
-  return { id: "", name: "" };
+  return { id: "", name: "", amount: 0 };
 }

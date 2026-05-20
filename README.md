@@ -1,185 +1,60 @@
-# 🏢 Company Clicker
+# Company Clicker
 
-**Company Clicker** is a browser-based idle/clicker game built with **HTML**, **CSS**, **JavaScript ES Modules**, **Vite**, and **decimal.js**.
+Company Clicker is a browser-based idle/clicker game built with HTML, CSS, JavaScript ES Modules, Vite, and decimal.js.
 
-Start from a single click and grow into a massive automated business empire. Purchase generators, unlock upgrades, gain levels, and eventually perform powerful **Rebirths** to earn permanent **Cosmic Gem** bonuses.
+Start from a single click and grow into a massive automated business empire. Buy generators, unlock upgrades, gain levels, and perform Rebirths to earn permanent Cosmic Gem bonuses.
 
----
+## Features
 
-## 🎮 Overview
+- Interactive main click button with floating numbers, particles, and critical hits
+- XP and level system with an animated progress bar
+- 10 automatic generator tiers with bulk purchase modes: x1, x10, x100, and Max
+- Click upgrades, generator upgrades, global DPS upgrades, and autoclicker upgrades
+- Rebirth system with Cosmic Gems and an expanded permanent upgrade shop
+- Achievement system with toast notifications
+- Dark modern responsive UI
+- Browser autosave with localStorage
+- Offline earnings capped at 8 hours
+- Big number calculations powered by decimal.js
 
-The game combines:
-- Incremental progression
-- Idle mechanics
-- Prestige systems
-- Big-number scaling
-- Reward-driven feedback loops
+## Gameplay
 
-into a modern and polished clicker experience inspired by classic idle games.
+Click the central coin button to earn coins. Use those coins to buy generators from the Generators tab. Generators produce passive DPS and keep earning money while the game is open.
 
-The focus of the project is:
-- scalable architecture,
-- responsive UI,
-- satisfying progression,
-- and handling extremely large numbers safely using `decimal.js`.
+Earning coins also grants XP. Leveling up increases click value by 10% and unlocks stronger upgrades.
 
----
+Once you hold 1,000,000 coins at the same time, Rebirth becomes available. Rebirth resets the current run but grants Cosmic Gems. Cosmic Gems provide permanent money bonuses and can be spent in the Rebirth Shop.
 
-## ✨ Features
+## Generator Tiers
 
----
+- Sketchy Support
+- Corner Store
+- Factory
+- Corporation
+- Conglomerate
+- Orbital Office
+- Moon Mine
+- Quantum Bank
+- Star Market
+- Galactic Exchange
 
-### 🖱️ Interactive Main Click Button
+## Upgrade Types
 
-The core gameplay starts with clicking the central coin button.
+- Click upgrades multiply click value.
+- Generator upgrades multiply specific generator tiers.
+- Global upgrades multiply total DPS.
+- Autoclicker upgrades add automatic clicks per second.
+- Rebirth upgrades persist between Rebirths and improve long-term scaling.
 
-Includes:
-- Floating coin numbers
-- Particle effects
-- Critical hits
-- Animated feedback
-
----
-
-### 📈 XP & Level System
-
-Players gain XP while earning coins.
-
-Leveling up:
-- increases click value,
-- unlocks stronger scaling,
-- and updates an animated XP bar.
-
-#### 📊 Level Bonus
-
-Every level grants:
-- **+10% click value**
-
----
-
-### ⚙️ Automatic Generators
-
-Unlock five passive income generators.
-
-Features:
-- Passive DPS generation
-- Scaling prices
-- Bulk purchase modes:
-  - `x1`
-  - `x10`
-  - `x100`
-  - `Max`
-
----
-
-### ⬆️ Upgrade System
-
-Multiple upgrade categories:
-
-- Click upgrades
-- Generator upgrades
-- Autoclicker upgrades
-
-These upgrades dramatically increase production efficiency over time.
-
----
-
-### 🌌 Rebirth System
-
-Once the player reaches:
-```txt
-1,000,000 coins
-```
-
-Rebirth becomes available.
-
-Rebirth:
-- Resets the current run
-- Grants **Cosmic Gems**
-- Unlocks permanent bonuses
-
-#### 💎 Cosmic Gems
-
-Each Cosmic Gem grants:
+## Project Structure
 
 ```txt
-+2% permanent money bonus
-```
-
----
-
-### 🏆 Achievement System
-
-Unlock achievements for:
-- milestones,
-- progression,
-- production,
-- and special actions.
-
-Includes:
-- Toast notifications
-- Persistent unlock tracking
-
----
-
-### 🌙 Modern Responsive UI
-
-Features:
-- Dark modern interface
-- Responsive 3-panel layout
-- Smooth transitions
-- Hover feedback
-- Animated panels
-
----
-
-### 💾 Save & Offline Progress
-
-The game automatically:
-- Saves every 5 seconds
-- Saves on tab close
-- Calculates offline earnings
-
-Offline progression is capped at:
-```txt
-8 hours
-```
-
----
-
-### 🔢 Big Number Support
-
-Powered by:
-
-```txt
-decimal.js
-```
-
-This prevents floating-point precision issues during long idle sessions with huge values.
-
----
-
-## 🛠️ Tech Stack
-
-| Technology | Purpose |
-|---|---|
-| HTML5 | Structure |
-| CSS3 | Styling |
-| JavaScript ES Modules | Game architecture |
-| Vite | Development/build tool |
-| decimal.js | Big number calculations |
-| localStorage | Save persistence |
-
----
-
-## 📂 Project Structure
-
-```text
 .
 ├── index.html
 ├── styles.css
 ├── package.json
 ├── package-lock.json
+├── vite.config.js
 ├── src
 │   ├── gameState.js
 │   ├── generators.js
@@ -191,106 +66,28 @@ This prevents floating-point precision issues during long idle sessions with hug
 └── dist
 ```
 
----
+## Modules
 
-## 🧠 Module Breakdown
+- `gameState.js` defines initial state, Decimal helpers, constants, serialization, and save hydration.
+- `generators.js` defines generator data, price scaling, DPS calculations, and purchases.
+- `upgrades.js` defines regular upgrade data and autoclicker calculations.
+- `rebirth.js` defines Rebirth requirements, Cosmic Gem rewards, and permanent upgrades.
+- `save.js` manages localStorage, autosave, loading, reset, and offline earnings.
+- `ui.js` renders the HUD, shops, modals, particles, floating numbers, and toasts.
+- `main.js` runs the 20 ticks/second game loop and coordinates gameplay events.
 
-### `gameState.js`
-
-Defines:
-- Initial state
-- Decimal helpers
-- Constants
-- Save serialization
-- State hydration
-
----
-
-### `generators.js`
-
-Handles:
-- Generator data
-- Price scaling
-- DPS calculations
-- Purchases
-
----
-
-### `upgrades.js`
-
-Defines:
-- Upgrade data
-- Click modifiers
-- Autoclicker modifiers
-
----
-
-### `rebirth.js`
-
-Controls:
-- Rebirth requirements
-- Cosmic Gem rewards
-- Permanent bonuses
-
----
-
-### `save.js`
-
-Manages:
-- `localStorage`
-- Autosaving
-- Save loading
-- Offline earnings
-- Reset system
-
----
-
-### `ui.js`
-
-Responsible for:
-- Rendering
-- Floating numbers
-- Particles
-- Modals
-- Toast notifications
-- Shop panels
-
----
-
-### `main.js`
-
-Runs:
-- Main game loop
-- Tick system
-- Event coordination
-
-The game updates at:
-```txt
-20 ticks per second
-```
-
----
-
-## 🚀 Getting Started
-
-### 📋 Requirements
+## Requirements
 
 - Node.js
 - npm
 
----
-
-## ⚙️ Installation
-
-### 1. Install dependencies
+## Install
 
 ```bash
 npm install
 ```
 
----
-
-## ▶️ Run Locally
+## Run Locally
 
 ```bash
 npm run dev
@@ -304,117 +101,82 @@ Tested locally at:
 http://127.0.0.1:5173
 ```
 
-> ⚠️ Do not open `index.html` directly from the filesystem.  
-> The project relies on Vite and JavaScript module resolution.
+Do not open `index.html` directly from the filesystem. The project relies on Vite and JavaScript module resolution.
 
----
-
-## 📦 Build Production Version
+## Build
 
 ```bash
 npm run build
 ```
 
-The production files will be generated inside:
+The production build is generated in:
 
 ```txt
 dist/
 ```
 
----
-
-## 👀 Preview Production Build
+## Preview
 
 ```bash
 npm run preview
 ```
 
----
+## GitHub Pages
 
-## 💾 Save Data
+This project includes a GitHub Actions workflow for GitHub Pages deployment:
 
-Save data is stored under the following localStorage key:
+```txt
+.github/workflows/deploy.yml
+```
+
+In the repository settings, enable:
+
+```txt
+Settings > Pages > Build and deployment > Source > GitHub Actions
+```
+
+The Vite base path is configured automatically in `vite.config.js`.
+
+## Save Data
+
+The game saves automatically in the browser every 5 seconds and when the tab is closed. There is no manual save button.
+
+Save data is stored under this localStorage key:
 
 ```txt
 company-clicker-save-v1
 ```
 
-Features include:
-- Autosave every 5 seconds
-- Save button
-- Reset confirmation modal
-- Offline earnings calculation
+The game also calculates offline earnings on load, capped at 8 hours.
 
----
+## Core Formulas
 
-## 📐 Core Formulas
+Generator price scaling:
 
-### 💰 Generator Price Scaling
+```txt
+currentPrice = basePrice * (1.15 ^ ownedAmount)
+```
 
+XP required:
 
+```txt
+xpRequired = 100 * (1.5 ^ level)
+```
 
----
+Rebirth Cosmic Gems:
 
-### ⭐ XP Requirement Formula
+```txt
+floor(sqrt(totalCoinsEarnedThisRun / 1,000,000))
+```
 
+Cosmic Gem money multiplier:
 
+```txt
+1 + cosmicGems * gemPower
+```
 
----
+By default, `gemPower` is 0.02. The Rebirth Shop can increase it to 0.03.
 
-### 🌌 Rebirth Cosmic Gems Formula
+## License
 
-
-
----
-
-### 💎 Cosmic Gem Money Multiplier
-
-
-
----
-
-## 🎨 Visual Style
-
-Inspired by:
-- Modern idle games
-- Neon dashboard interfaces
-- Minimalist dark UI
-- Financial management apps
-
-Includes:
-- Animated gradients
-- Floating particles
-- Reactive UI feedback
-- Smooth transitions
-
----
-
-## 🔮 Future Improvements
-
-- [ ] 🎵 Background music & SFX
-- [ ] ☁️ Cloud save support
-- [ ] 🏢 Additional generator tiers
-- [ ] 🌎 Prestige worlds
-- [ ] 📊 Statistics dashboard
-- [ ] 🎰 Random events system
-- [ ] 🧪 Temporary boosters
-- [ ] 📱 Mobile optimization
-- [ ] 🏆 Seasonal leaderboards
-
----
-
-## 📄 License
-
-This project is open-source and available under the **MIT License**.
-
----
-
-## 👨‍💻 Author
-
-Developed by **Keller Nz**
-
----
-
-## ⭐ Support
-
-If you enjoyed this project, consider giving it a ⭐ on GitHub!
+This project is open-source and available under the MIT License.

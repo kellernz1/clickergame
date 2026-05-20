@@ -6,6 +6,11 @@ export const GENERATORS = [
   { id: "factory", name: "Factory", baseDps: D(1000), basePrice: D(5000) },
   { id: "corporation", name: "Corporation", baseDps: D(50000), basePrice: D(200000) },
   { id: "conglomerate", name: "Conglomerate", baseDps: D(2000000), basePrice: D(10000000) },
+  { id: "orbitalOffice", name: "Orbital Office", baseDps: D(90000000), basePrice: D(500000000) },
+  { id: "moonMine", name: "Moon Mine", baseDps: D(4000000000), basePrice: D(25000000000) },
+  { id: "quantumBank", name: "Quantum Bank", baseDps: D(180000000000), basePrice: D(1200000000000) },
+  { id: "starMarket", name: "Star Market", baseDps: D(9000000000000), basePrice: D(80000000000000) },
+  { id: "galacticExchange", name: "Galactic Exchange", baseDps: D(500000000000000), basePrice: D(5000000000000000) },
 ];
 
 /**
@@ -58,7 +63,15 @@ export function getMaxAffordable(generator) {
 export function getGeneratorMultiplier(generatorId) {
   let multiplier = D(1);
   if (generatorId === "support" && state.purchasedUpgrades.freeCoffee) multiplier = multiplier.times(2);
+  if (generatorId === "cornerStore" && state.purchasedUpgrades.franchiseManual) multiplier = multiplier.times(2);
   if (generatorId === "factory" && state.purchasedUpgrades.advancedAi) multiplier = multiplier.times(3);
+  if (generatorId === "corporation" && state.purchasedUpgrades.boardRoom) multiplier = multiplier.times(2.5);
+  if (generatorId === "conglomerate" && state.purchasedUpgrades.globalLogistics) multiplier = multiplier.times(4);
+  if (generatorId === "orbitalOffice" && state.purchasedUpgrades.orbitalPayroll) multiplier = multiplier.times(5);
+  if (generatorId === "moonMine" && state.purchasedUpgrades.lunarDrills) multiplier = multiplier.times(6);
+  if (generatorId === "quantumBank" && state.purchasedUpgrades.quantumLedger) multiplier = multiplier.times(8);
+  if (generatorId === "starMarket" && state.purchasedUpgrades.starTraders) multiplier = multiplier.times(10);
+  if (generatorId === "galacticExchange" && state.purchasedUpgrades.galacticMonopoly) multiplier = multiplier.times(12);
   return multiplier;
 }
 
@@ -72,6 +85,8 @@ export function getTotalDps() {
     total = total.plus(generator.baseDps.times(state.generators[generator.id] || 0).times(getGeneratorMultiplier(generator.id)));
   }
   if (state.achievements.magnate) total = total.times(1.1);
+  if (state.purchasedUpgrades.managementSchool) total = total.times(1.25);
+  if (state.purchasedUpgrades.hyperAutomation) total = total.times(2);
   return total.times(getGlobalMoneyMultiplier());
 }
 
@@ -80,7 +95,11 @@ export function getTotalDps() {
  * @returns {Decimal}
  */
 export function getGlobalMoneyMultiplier() {
-  return D(1).plus(state.cosmicGems.times(0.02));
+  const gemPower = state.purchasedRebirthUpgrades.gemEfficiency ? D(0.03) : D(0.02);
+  let multiplier = D(1).plus(state.cosmicGems.times(gemPower));
+  if (state.purchasedRebirthUpgrades.cosmicPortfolio) multiplier = multiplier.times(1.25);
+  if (state.purchasedRebirthUpgrades.darkMatterDividend) multiplier = multiplier.times(2);
+  return multiplier;
 }
 
 /**

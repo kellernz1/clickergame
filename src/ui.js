@@ -50,11 +50,11 @@ export function initUi(handlers) {
     modal: document.querySelector("#modal-root"),
     toastStack: document.querySelector("#toast-stack"),
     autosave: document.querySelector("#autosave-status"),
+    autosavePanel: document.querySelector("#autosave-panel-status"),
   });
 
   dom.mainClick.addEventListener("click", (event) => handlers.onMainClick(event));
   dom.rebirthButton.addEventListener("click", handlers.onRebirthClick);
-  document.querySelector("#save-now").addEventListener("click", handlers.onSaveNow);
   document.querySelector("#reset-game").addEventListener("click", handlers.onResetGame);
   document.querySelectorAll(".tab-button").forEach((button) => {
     button.addEventListener("click", () => setActiveTab(button.dataset.tab));
@@ -83,10 +83,6 @@ export function renderHud() {
   dom.xp.textContent = `${formatNumber(state.xp)} / ${formatNumber(getXpRequired(state.playerLevel))}`;
   const xpPct = getPercent(state.xp, getXpRequired(state.playerLevel));
   dom.xpFill.style.width = `${xpPct}%`;
-  renderGenerators();
-  renderUpgrades();
-  renderRebirthShop();
-  renderLog();
   dom.rebirthButton.classList.toggle("hidden", !canRebirth());
   dom.rebirthButton.classList.toggle("pulse", canRebirth());
   const rebirthProgress = getPercent(state.coins, REBIRTH_THRESHOLD);
@@ -97,6 +93,7 @@ export function renderHud() {
     ? `Click Rebirth to reset and earn ${formatNumber(calculateRebirthGems())} Cosmic Gems.`
     : `${formatNumber(missingForRebirth.gt(0) ? missingForRebirth : D(0))} coins left to unlock Rebirth.`;
   updateShopButtonStates();
+  renderLog();
 }
 
 /**
@@ -155,7 +152,7 @@ function renderUpgrades() {
       <div>
         <h3>${upgrade.name}</h3>
         <p>${upgrade.type} | ${upgrade.description}</p>
-        <p class="${unlocked ? "unlocked-text" : "locked-text"}">${unlocked ? "Unlocked" : `Locked: ${upgrade.unlockText}`}</p>
+        <p data-upgrade-status="${upgrade.id}" class="${unlocked ? "unlocked-text" : "locked-text"}">${unlocked ? "Unlocked" : `Locked: ${upgrade.unlockText}`}</p>
       </div>
       <button class="buy-button" data-upgrade="${upgrade.id}" ${disabled ? "disabled" : ""}>Buy<br>${formatNumber(upgrade.cost)}</button>
     </article>
@@ -222,7 +219,13 @@ function updateShopButtonStates() {
   dom.upgrades.querySelectorAll("[data-upgrade]").forEach((button) => {
     const upgrade = UPGRADES.find((item) => item.id === button.dataset.upgrade);
     if (!upgrade) return;
-    button.disabled = !upgrade.isUnlocked() || state.coins.lt(upgrade.cost);
+    const unlocked = upgrade.isUnlocked();
+    const status = dom.upgrades.querySelector(`[data-upgrade-status="${upgrade.id}"]`);
+    button.disabled = !unlocked || state.coins.lt(upgrade.cost);
+    if (status) {
+      status.className = unlocked ? "unlocked-text" : "locked-text";
+      status.textContent = unlocked ? "Unlocked" : `Locked: ${upgrade.unlockText}`;
+    }
   });
 
   dom.rebirthShop.querySelectorAll("[data-rebirth-upgrade]").forEach((button) => {
@@ -234,6 +237,7 @@ function updateShopButtonStates() {
 
 export function setSaveStatus(text) {
   dom.autosave.textContent = text;
+  if (dom.autosavePanel) dom.autosavePanel.textContent = text;
 }
 
 export function addLog(message) {
@@ -273,7 +277,7 @@ export function showToast(title, message) {
   setTimeout(() => toast.remove(), 4200);
 }
 
-export function showModal({ title, message, confirmText = "Confirmar", cancelText = "Cancelar", danger = false, onConfirm }) {
+export function showModal({ title, message, confirmText = "Confirm", cancelText = "Cancel", danger = false, onConfirm }) {
   dom.modal.classList.remove("hidden");
   dom.modal.innerHTML = `
     <section class="modal-card" role="dialog" aria-modal="true">

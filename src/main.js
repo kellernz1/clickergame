@@ -1,7 +1,7 @@
 import { D, getXpRequired, replaceState, TICK_MS, TICKS_PER_SECOND, createInitialState, state } from "./gameState.js";
-import { getTotalDps } from "./generators.js";
+import { getGlobalMoneyMultiplier, getTotalDps } from "./generators.js";
 import { clearSave, loadGame, saveGame } from "./save.js";
-import { canRebirth, getCriticalChance, getXpMultiplier, performRebirth } from "./rebirth.js";
+import { canRebirth, getCriticalChance, getCriticalMultiplier, getXpMultiplier, performRebirth } from "./rebirth.js";
 import { getAchievementClickMultiplier, getAutoClicksPerSecond } from "./upgrades.js";
 import {
   addLog,
@@ -30,16 +30,11 @@ initUi({
     showRebirthConfirm(() => {
       const result = performRebirth();
       addLog(`Rebirth complete. Gems gained: ${formatNumber(result.gemsGained)}.`);
-      if (result.keptGeneratorName) addLog(`Permanent upgrade kept 1x ${result.keptGeneratorName}.`);
+      if (result.keptGeneratorName) addLog(`Permanent upgrade kept ${result.keptGeneratorAmount}x ${result.keptGeneratorName}.`);
       checkAchievements();
       saveGame();
       render();
     });
-  },
-  onSaveNow: () => {
-    saveGame();
-    setSaveStatus("Saved now");
-    showToast("Save", "Progress saved in this browser.");
   },
   onResetGame: () => {
     showModal({
@@ -67,7 +62,7 @@ if (offline.offlineGain && offline.offlineGain.gt(0) && offline.offlineSeconds >
 setInterval(tick, TICK_MS);
 setInterval(() => {
   saveGame();
-  setSaveStatus("Autosave");
+  setSaveStatus("Saved automatically");
 }, 5000);
 window.addEventListener("beforeunload", saveGame);
 window.addEventListener("company:generatorBought", () => {
@@ -86,7 +81,7 @@ function tick() {
 
   const autoClicks = getAutoClicksPerSecond().div(TICKS_PER_SECOND);
   if (autoClicks.gt(0)) {
-    const criticalAverage = D(1).plus(D(getCriticalChance()).times(2));
+    const criticalAverage = D(1).plus(D(getCriticalChance()).times(getCriticalMultiplier().minus(1)));
     const autoGain = state.clickValue
       .times(getAchievementClickMultiplier())
       .times(autoClicks)
@@ -119,7 +114,7 @@ function handleMainClick(event) {
  */
 function calculateClickGain(critical) {
   let gain = state.clickValue.times(getAchievementClickMultiplier()).times(getMoneyMultiplierWithoutDpsDoubleCount());
-  if (critical) gain = gain.times(3);
+  if (critical) gain = gain.times(getCriticalMultiplier());
   return gain;
 }
 
@@ -128,7 +123,7 @@ function calculateClickGain(critical) {
  * @returns {Decimal}
  */
 function getMoneyMultiplierWithoutDpsDoubleCount() {
-  return D(1).plus(state.cosmicGems.times(0.02));
+  return getGlobalMoneyMultiplier();
 }
 
 /**
