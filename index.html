@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Company Clicker</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+    <div id="modal-root" class="modal-root hidden"></div>
+
+    <main class="game-shell">
+      <section class="panel stats-panel" aria-label="Player stats">
+        <div class="brand-block">
+          <div class="brand-mark">$</div>
+          <div>
+            <h1>Company Clicker</h1>
+            <p>An infinite-growth business empire</p>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <article class="stat-tile">
+            <span>Coins</span>
+            <strong id="coins-stat">0</strong>
+          </article>
+          <article class="stat-tile">
+            <span>Run total</span>
+            <strong id="run-total-stat">0</strong>
+          </article>
+          <article class="stat-tile">
+            <span>DPS</span>
+            <strong id="dps-stat">0</strong>
+          </article>
+          <article class="stat-tile">
+            <span>Click</span>
+            <strong id="click-stat">1</strong>
+          </article>
+          <article class="stat-tile">
+            <span>Level</span>
+            <strong id="level-stat">1</strong>
+          </article>
+          <article class="stat-tile">
+            <span>Rebirths</span>
+            <strong id="rebirths-stat">0</strong>
+          </article>
+          <article class="stat-tile">
+            <span>Cosmic Gems</span>
+            <strong id="gems-stat">0</strong>
+          </article>
+          <article class="stat-tile">
+            <span>Critical</span>
+            <strong id="crit-stat">5%</strong>
+          </article>
+        </div>
+
+        <div class="xp-panel">
+          <div class="xp-label">
+            <span>XP</span>
+            <strong id="xp-stat">0 / 150</strong>
+          </div>
+          <div class="xp-bar" role="progressbar" aria-label="XP progress">
+            <div id="xp-fill" class="xp-fill"></div>
+          </div>
+        </div>
+
+        <div class="save-actions">
+          <button id="save-now" class="secondary-button">Save now</button>
+          <button id="reset-game" class="danger-button">Reset game</button>
+        </div>
+      </section>
+
+      <section class="panel click-panel" aria-label="Main panel">
+        <div class="company-stage">
+          <div id="effects-layer" class="effects-layer"></div>
+          <button id="main-click" class="main-click" aria-label="Earn coins">
+            <span class="coin-face">$</span>
+            <span>CLICK</span>
+          </button>
+        </div>
+
+        <button id="rebirth-button" class="rebirth-button hidden">Rebirth available</button>
+
+        <section class="rebirth-status">
+          <div class="section-title">
+            <h2>Rebirth</h2>
+            <span id="rebirth-ready-label">Locked</span>
+          </div>
+          <p id="rebirth-status-text">Hold 1M coins at once to unlock Rebirth.</p>
+          <div class="xp-bar rebirth-progress" role="progressbar" aria-label="Rebirth progress">
+            <div id="rebirth-fill" class="rebirth-fill"></div>
+          </div>
+        </section>
+
+        <section class="log-panel">
+          <div class="section-title">
+            <h2>Log</h2>
+            <span id="autosave-status">Ready</span>
+          </div>
+          <ul id="action-log" class="action-log"></ul>
+        </section>
+      </section>
+
+      <section class="panel shop-panel" aria-label="Shop">
+        <nav class="tabs" aria-label="Shop tabs">
+          <button class="tab-button active" data-tab="generators">Generators</button>
+          <button class="tab-button" data-tab="upgrades">Upgrades</button>
+          <button class="tab-button" data-tab="rebirth">Rebirth Shop</button>
+        </nav>
+
+        <div id="generators-tab" class="tab-content active">
+          <div class="buy-mode">
+            <button class="buy-mode-button active" data-buy-mode="1">x1</button>
+            <button class="buy-mode-button" data-buy-mode="10">x10</button>
+            <button class="buy-mode-button" data-buy-mode="100">x100</button>
+            <button class="buy-mode-button" data-buy-mode="max">Max</button>
+          </div>
+          <div id="generators-list" class="shop-list"></div>
+        </div>
+
+        <div id="upgrades-tab" class="tab-content">
+          <div id="upgrades-list" class="shop-list"></div>
+        </div>
+
+        <div id="rebirth-tab" class="tab-content">
+          <div class="rebirth-note">
+            Each Cosmic Gem grants a permanent +2% money bonus.
+          </div>
+          <div id="rebirth-shop-list" class="shop-list"></div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
