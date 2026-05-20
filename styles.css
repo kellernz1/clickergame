@@ -42,6 +42,7 @@ button:disabled {
 .game-shell {
   display: grid;
   grid-template-columns: minmax(250px, 0.9fr) minmax(320px, 1.2fr) minmax(320px, 1fr);
+  align-items: start;
   gap: 16px;
   width: min(1480px, 100%);
   min-height: 100vh;
@@ -51,6 +52,8 @@ button:disabled {
 
 .panel {
   min-width: 0;
+  height: calc(100vh - 32px);
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: linear-gradient(180deg, rgba(21, 33, 54, 0.94), rgba(11, 18, 32, 0.92));
@@ -61,6 +64,7 @@ button:disabled {
 .stats-panel,
 .shop-panel {
   padding: 18px;
+  overflow-y: auto;
 }
 
 .brand-block {
@@ -203,6 +207,7 @@ h1 {
   grid-template-rows: minmax(340px, 1fr) auto auto minmax(150px, 210px);
   gap: 14px;
   padding: 18px;
+  min-height: 0;
 }
 
 .company-stage {
@@ -210,7 +215,7 @@ h1 {
   display: grid;
   place-items: center;
   overflow: hidden;
-  min-height: 360px;
+  min-height: 0;
   border-radius: 8px;
   background:
     linear-gradient(180deg, rgba(15, 31, 55, 0.84), rgba(8, 14, 27, 0.92)),
@@ -593,9 +598,19 @@ h1 {
     padding: 10px;
   }
 
+  .panel {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
   .click-panel {
     grid-row: auto;
     min-height: auto;
+  }
+
+  .company-stage {
+    min-height: 340px;
   }
 
   .stat-grid {
