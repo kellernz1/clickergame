@@ -3,6 +3,36 @@ import { GENERATORS } from "./generators.js";
 
 export const REBIRTH_UPGRADES = [
   {
+    id: "orbitalPermit",
+    name: "Orbital Permit",
+    cost: D(2),
+    description: "Unlocks Orbital Offices.",
+  },
+  {
+    id: "lunarCharter",
+    name: "Lunar Charter",
+    cost: D(5),
+    description: "Unlocks Moon Mines.",
+  },
+  {
+    id: "quantumLicense",
+    name: "Quantum License",
+    cost: D(12),
+    description: "Unlocks Quantum Banks.",
+  },
+  {
+    id: "stellarPermit",
+    name: "Stellar Permit",
+    cost: D(30),
+    description: "Unlocks Star Markets.",
+  },
+  {
+    id: "galacticRights",
+    name: "Galactic Rights",
+    cost: D(75),
+    description: "Unlocks Galactic Exchanges.",
+  },
+  {
     id: "critChance",
     name: "+10% critical chance",
     cost: D(5),
@@ -74,6 +104,48 @@ export const REBIRTH_UPGRADES = [
     cost: D(50),
     description: "Keeps 5 units of your best owned generator after Rebirth.",
   },
+  {
+    id: "procurementOffice",
+    name: "Procurement Office",
+    cost: D(10),
+    description: "All generator prices are 10% cheaper.",
+  },
+  {
+    id: "quantumProcurement",
+    name: "Quantum Procurement",
+    cost: D(45),
+    description: "All generator prices are another 20% cheaper.",
+  },
+  {
+    id: "trainingBudget",
+    name: "Training Budget",
+    cost: D(10),
+    description: "All regular upgrades are 10% cheaper.",
+  },
+  {
+    id: "executiveCoupons",
+    name: "Executive Coupons",
+    cost: D(45),
+    description: "All regular upgrades are another 20% cheaper.",
+  },
+  {
+    id: "starterCapital",
+    name: "Starter Capital",
+    cost: D(12),
+    description: "Start each Rebirth run with 1K coins.",
+  },
+  {
+    id: "seedRound",
+    name: "Seed Round",
+    cost: D(35),
+    description: "Start each Rebirth run with 100K coins.",
+  },
+  {
+    id: "gemFoundry",
+    name: "Gem Foundry",
+    cost: D(90),
+    description: "Earn 75% more Cosmic Gems from each Rebirth.",
+  },
 ];
 
 /**
@@ -92,6 +164,7 @@ export function canRebirth() {
 export function calculateRebirthGems() {
   let gems = state.runCoins.div(1000000).sqrt().floor();
   if (state.purchasedRebirthUpgrades.rebirthHarvester) gems = gems.times(1.25).floor();
+  if (state.purchasedRebirthUpgrades.gemFoundry) gems = gems.times(1.75).floor();
   return gems;
 }
 
@@ -151,6 +224,8 @@ export function performRebirth() {
   state.purchasedUpgrades = {};
   state.rebirths += 1;
   state.cosmicGems = state.cosmicGems.plus(gemsGained);
+  if (state.purchasedRebirthUpgrades.seedRound) state.coins = D(100000);
+  else if (state.purchasedRebirthUpgrades.starterCapital) state.coins = D(1000);
   state.generators = {
     ...Object.fromEntries(GENERATORS.map((generator) => [generator.id, 0])),
   };

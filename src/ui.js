@@ -1,7 +1,7 @@
 import { D, getXpRequired, REBIRTH_THRESHOLD, state } from "./gameState.js";
-import { buyGenerator, GENERATORS, getBulkGeneratorPrice, getGeneratorPrice, getMaxAffordable, getTotalDps } from "./generators.js";
+import { buyGenerator, GENERATORS, getBulkGeneratorPrice, getGeneratorPrice, getMaxAffordable, getTotalDps, isGeneratorUnlocked } from "./generators.js";
 import { canRebirth, buyRebirthUpgrade, calculateRebirthGems, getCriticalChance, REBIRTH_UPGRADES } from "./rebirth.js";
-import { buyUpgrade, getAchievementClickMultiplier, UPGRADES } from "./upgrades.js";
+import { buyUpgrade, getAchievementClickMultiplier, getUpgradeCost, UPGRADES } from "./upgrades.js";
 
 const dom = {};
 
@@ -124,18 +124,19 @@ function getPercent(current, required) {
 
 function renderGenerators() {
   dom.generators.innerHTML = GENERATORS.map((generator) => {
+    const unlocked = isGeneratorUnlocked(generator);
     const amount = state.settings.buyMode === "max" ? getMaxAffordable(generator).amount : Number(state.settings.buyMode);
     const cost = state.settings.buyMode === "max" ? getMaxAffordable(generator).cost : getBulkGeneratorPrice(generator, amount);
-    const disabled = amount <= 0 || state.coins.lt(cost);
+    const disabled = !unlocked || amount <= 0 || state.coins.lt(cost);
     return `
       <article class="shop-card">
         <div>
           <h3>${generator.name} <span>x${state.generators[generator.id] || 0}</span></h3>
           <p>Base DPS: ${formatNumber(generator.baseDps)} | Producing: ${formatNumber(generator.baseDps.times(state.generators[generator.id] || 0))}/s</p>
-          <p>Next price: ${formatNumber(getGeneratorPrice(generator))}</p>
+          <p data-generator-status="${generator.id}" class="${unlocked ? "unlocked-text" : "locked-text"}">${unlocked ? `Next price: ${formatNumber(getGeneratorPrice(generator))}` : `Locked: ${generator.unlockText}`}</p>
         </div>
         <button class="buy-button" data-generator="${generator.id}" ${disabled ? "disabled" : ""}>
-          ${state.settings.buyMode === "max" ? `Buy Max (${amount})` : `Buy x${amount}`}<br>${formatNumber(cost)}
+          ${unlocked ? `${state.settings.buyMode === "max" ? `Buy Max (${amount})` : `Buy x${amount}`}<br>${formatNumber(cost)}` : "Locked"}
         </button>
       </article>
     `;
@@ -146,7 +147,8 @@ function renderUpgrades() {
   const visible = UPGRADES.filter((upgrade) => !state.purchasedUpgrades[upgrade.id]);
   dom.upgrades.innerHTML = visible.length ? visible.map((upgrade) => {
     const unlocked = upgrade.isUnlocked();
-    const disabled = !unlocked || state.coins.lt(upgrade.cost);
+    const cost = getUpgradeCost(upgrade);
+    const disabled = !unlocked || state.coins.lt(cost);
     return `
     <article class="shop-card">
       <div>
@@ -154,7 +156,7 @@ function renderUpgrades() {
         <p>${upgrade.type} | ${upgrade.description}</p>
         <p data-upgrade-status="${upgrade.id}" class="${unlocked ? "unlocked-text" : "locked-text"}">${unlocked ? "Unlocked" : `Locked: ${upgrade.unlockText}`}</p>
       </div>
-      <button class="buy-button" data-upgrade="${upgrade.id}" ${disabled ? "disabled" : ""}>Buy<br>${formatNumber(upgrade.cost)}</button>
+      <button class="buy-button" data-upgrade="${upgrade.id}" ${disabled ? "disabled" : ""}>Buy<br>${formatNumber(cost)}</button>
     </article>
   `;
   }).join("") : `<div class="rebirth-note">All upgrades for this run have been purchased.</div>`;
@@ -210,18 +212,26 @@ function updateShopButtonStates() {
   dom.generators.querySelectorAll("[data-generator]").forEach((button) => {
     const generator = GENERATORS.find((item) => item.id === button.dataset.generator);
     if (!generator) return;
+    const unlocked = isGeneratorUnlocked(generator);
+    const status = dom.generators.querySelector(`[data-generator-status="${generator.id}"]`);
     const amount = state.settings.buyMode === "max" ? getMaxAffordable(generator).amount : Number(state.settings.buyMode);
     const cost = state.settings.buyMode === "max" ? getMaxAffordable(generator).cost : getBulkGeneratorPrice(generator, amount);
-    button.disabled = amount <= 0 || state.coins.lt(cost);
-    button.innerHTML = `${state.settings.buyMode === "max" ? `Buy Max (${amount})` : `Buy x${amount}`}<br>${formatNumber(cost)}`;
+    button.disabled = !unlocked || amount <= 0 || state.coins.lt(cost);
+    button.innerHTML = unlocked ? `${state.settings.buyMode === "max" ? `Buy Max (${amount})` : `Buy x${amount}`}<br>${formatNumber(cost)}` : "Locked";
+    if (status) {
+      status.className = unlocked ? "unlocked-text" : "locked-text";
+      status.textContent = unlocked ? `Next price: ${formatNumber(getGeneratorPrice(generator))}` : `Locked: ${generator.unlockText}`;
+    }
   });
 
   dom.upgrades.querySelectorAll("[data-upgrade]").forEach((button) => {
     const upgrade = UPGRADES.find((item) => item.id === button.dataset.upgrade);
     if (!upgrade) return;
     const unlocked = upgrade.isUnlocked();
+    const cost = getUpgradeCost(upgrade);
     const status = dom.upgrades.querySelector(`[data-upgrade-status="${upgrade.id}"]`);
-    button.disabled = !unlocked || state.coins.lt(upgrade.cost);
+    button.disabled = !unlocked || state.coins.lt(cost);
+    button.innerHTML = `Buy<br>${formatNumber(cost)}`;
     if (status) {
       status.className = unlocked ? "unlocked-text" : "locked-text";
       status.textContent = unlocked ? "Unlocked" : `Locked: ${upgrade.unlockText}`;

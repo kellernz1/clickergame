@@ -11,6 +11,7 @@ Start from a single click and grow into a massive automated business empire. Buy
 - 10 automatic generator tiers with bulk purchase modes: x1, x10, x100, and Max
 - Click upgrades, generator upgrades, global DPS upgrades, and autoclicker upgrades
 - Rebirth system with Cosmic Gems and an expanded permanent upgrade shop
+- Late-game generator tiers locked behind Rebirth Shop permits
 - Achievement system with toast notifications
 - Dark modern responsive UI
 - Browser autosave with localStorage
@@ -32,11 +33,11 @@ Once you hold 1,000,000 coins at the same time, Rebirth becomes available. Rebir
 - Factory
 - Corporation
 - Conglomerate
-- Orbital Office
-- Moon Mine
-- Quantum Bank
-- Star Market
-- Galactic Exchange
+- Orbital Office, unlocked with Orbital Permit
+- Moon Mine, unlocked with Lunar Charter
+- Quantum Bank, unlocked with Quantum License
+- Star Market, unlocked with Stellar Permit
+- Galactic Exchange, unlocked with Galactic Rights
 
 ## Upgrade Types
 
@@ -45,6 +46,7 @@ Once you hold 1,000,000 coins at the same time, Rebirth becomes available. Rebir
 - Global upgrades multiply total DPS.
 - Autoclicker upgrades add automatic clicks per second.
 - Rebirth upgrades persist between Rebirths and improve long-term scaling.
+- Rebirth permits unlock late-game generator tiers and are required for deep progression.
 
 ## Project Structure
 

@@ -6,12 +6,21 @@ export const GENERATORS = [
   { id: "factory", name: "Factory", baseDps: D(1000), basePrice: D(5000) },
   { id: "corporation", name: "Corporation", baseDps: D(50000), basePrice: D(200000) },
   { id: "conglomerate", name: "Conglomerate", baseDps: D(2000000), basePrice: D(10000000) },
-  { id: "orbitalOffice", name: "Orbital Office", baseDps: D(90000000), basePrice: D(500000000) },
-  { id: "moonMine", name: "Moon Mine", baseDps: D(4000000000), basePrice: D(25000000000) },
-  { id: "quantumBank", name: "Quantum Bank", baseDps: D(180000000000), basePrice: D(1200000000000) },
-  { id: "starMarket", name: "Star Market", baseDps: D(9000000000000), basePrice: D(80000000000000) },
-  { id: "galacticExchange", name: "Galactic Exchange", baseDps: D(500000000000000), basePrice: D(5000000000000000) },
+  { id: "orbitalOffice", name: "Orbital Office", baseDps: D(90000000), basePrice: D(500000000), rebirthUnlock: "orbitalPermit", unlockText: "Buy Orbital Permit in the Rebirth Shop." },
+  { id: "moonMine", name: "Moon Mine", baseDps: D(4000000000), basePrice: D(25000000000), rebirthUnlock: "lunarCharter", unlockText: "Buy Lunar Charter in the Rebirth Shop." },
+  { id: "quantumBank", name: "Quantum Bank", baseDps: D(180000000000), basePrice: D(1200000000000), rebirthUnlock: "quantumLicense", unlockText: "Buy Quantum License in the Rebirth Shop." },
+  { id: "starMarket", name: "Star Market", baseDps: D(9000000000000), basePrice: D(80000000000000), rebirthUnlock: "stellarPermit", unlockText: "Buy Stellar Permit in the Rebirth Shop." },
+  { id: "galacticExchange", name: "Galactic Exchange", baseDps: D(500000000000000), basePrice: D(5000000000000000), rebirthUnlock: "galacticRights", unlockText: "Buy Galactic Rights in the Rebirth Shop." },
 ];
+
+/**
+ * Checks whether a generator tier is unlocked for purchase.
+ * @param {object} generator
+ * @returns {boolean}
+ */
+export function isGeneratorUnlocked(generator) {
+  return !generator.rebirthUnlock || Boolean(state.purchasedRebirthUpgrades[generator.rebirthUnlock]);
+}
 
 /**
  * Calculates the current price for one generator after previous purchases.
@@ -20,7 +29,10 @@ export const GENERATORS = [
  * @returns {Decimal}
  */
 export function getGeneratorPrice(generator, owned = state.generators[generator.id]) {
-  return generator.basePrice.times(D(1.15).pow(owned));
+  let price = generator.basePrice.times(D(1.18).pow(owned));
+  if (state.purchasedRebirthUpgrades.procurementOffice) price = price.times(0.9);
+  if (state.purchasedRebirthUpgrades.quantumProcurement) price = price.times(0.8);
+  return price;
 }
 
 /**
@@ -44,6 +56,7 @@ export function getBulkGeneratorPrice(generator, amount) {
  * @returns {{amount: number, cost: Decimal}}
  */
 export function getMaxAffordable(generator) {
+  if (!isGeneratorUnlocked(generator)) return { amount: 0, cost: D(0) };
   let amount = 0;
   let cost = D(0);
   let nextCost = getGeneratorPrice(generator, state.generators[generator.id] || 0);
@@ -111,6 +124,7 @@ export function getGlobalMoneyMultiplier() {
 export function buyGenerator(generatorId, amount) {
   const generator = GENERATORS.find((item) => item.id === generatorId);
   if (!generator) return { ok: false, bought: 0, cost: D(0) };
+  if (!isGeneratorUnlocked(generator)) return { ok: false, bought: 0, cost: D(0), generator };
 
   const purchase = amount === "max" ? getMaxAffordable(generator) : { amount: Number(amount), cost: getBulkGeneratorPrice(generator, Number(amount)) };
   if (purchase.amount <= 0 || state.coins.lt(purchase.cost)) return { ok: false, bought: 0, cost: purchase.cost, generator };

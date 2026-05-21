@@ -220,11 +220,24 @@ export const UPGRADES = [
  */
 export function buyUpgrade(upgradeId) {
   const upgrade = UPGRADES.find((item) => item.id === upgradeId);
-  if (!upgrade || state.purchasedUpgrades[upgradeId] || !upgrade.isUnlocked() || state.coins.lt(upgrade.cost)) return { ok: false, upgrade };
-  state.coins = state.coins.minus(upgrade.cost);
+  const cost = upgrade ? getUpgradeCost(upgrade) : D(0);
+  if (!upgrade || state.purchasedUpgrades[upgradeId] || !upgrade.isUnlocked() || state.coins.lt(cost)) return { ok: false, upgrade };
+  state.coins = state.coins.minus(cost);
   state.purchasedUpgrades[upgradeId] = true;
   upgrade.apply();
   return { ok: true, upgrade };
+}
+
+/**
+ * Calculates the current cost of a regular upgrade after permanent discounts.
+ * @param {object} upgrade
+ * @returns {Decimal}
+ */
+export function getUpgradeCost(upgrade) {
+  let cost = upgrade.cost;
+  if (state.purchasedRebirthUpgrades.trainingBudget) cost = cost.times(0.9);
+  if (state.purchasedRebirthUpgrades.executiveCoupons) cost = cost.times(0.8);
+  return cost;
 }
 
 /**
